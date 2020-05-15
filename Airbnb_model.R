@@ -112,7 +112,7 @@ View(prediction106)
 
 ##CALCULATE ROOT MEAN SQUARE PREDICTION ERROR ON TEST DATA: THE OUT-OF-SAMPLE ERROR MEASURE
 RMSE101=sqrt(sum((prediction101-testing$price)^2)/(length(testing$price)))
-RMSE101 #lowest (E_out - E_in), also lowest E_out (617.73 - 610.9)
+RMSE101
 
 RMSE102=sqrt(sum((prediction102-testing$price)^2)/(length(testing$price)))
 RMSE102
