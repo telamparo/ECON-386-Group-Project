@@ -52,6 +52,18 @@ summary(M104)
 confint(M104)
 
 summary(lm(price~neighbourhood, df1))
+summary(lm(price~property_type, df1))
+summary(lm(price~room_type, df1))
+summary(lm(price~zipcode, df1))
+
+class(df1$room_type)
+df1$privateroom[df1$room_type=='Private room']<-1
+df1$privateroom[df1$room_type!='Private room']<-0
+View(df1$privateroom)
+
+df1$sharedroom[df1$room_type=='Shared room']<-1
+df1$sharedroom[df1$room_type!='Shared room']<-0
+View(df1$sharedroom)
 
 class(df1$neighbourhood)
 df1$corridor[df1$neighbourhood=='Corridor']<-1
@@ -69,6 +81,14 @@ View(df1$lajolla)
 df1$missionbeach[df1$neighbourhood=='Mission Beach']<-1
 df1$missionbeach[df1$neighbourhood!='Mission Beach']<-0
 View(df1$missionbeach)
+
+testing$privateroom[testing$room_type=='Private room']<-1
+testing$privateroom[testing$room_type!='Private room']<-0
+View(testing$privateroom)
+
+testing$sharedroom[testing$room_type=='Shared room']<-1
+testing$sharedroom[testing$room_type!='Shared room']<-0
+View(testing$sharedroom)
 
 testing$corridor[testing$neighbourhood=='Corridor']<-1
 testing$corridor[testing$neighbourhood!='Corridor']<-0
@@ -92,6 +112,8 @@ summary(M105)
 M106 <- lm(price~0+accommodates+bathrooms+number_of_reviews+grantville+lajolla, df1)
 summary(M106)
 
+confint(M106)
+
 prediction101 <- predict(M101, testing)
 View(prediction101)
 
@@ -111,20 +133,64 @@ prediction106 <- predict(M106, testing)
 View(prediction106)
 
 ##CALCULATE ROOT MEAN SQUARE PREDICTION ERROR ON TEST DATA: THE OUT-OF-SAMPLE ERROR MEASURE
-RMSE101=sqrt(sum((prediction101-testing$price)^2)/(length(testing$price)))
+RMSE101=sqrt(sum((prediction101-testing$price)^2)/(length(testing$price)-5))
 RMSE101
 
-RMSE102=sqrt(sum((prediction102-testing$price)^2)/(length(testing$price)))
+RMSE102=sqrt(sum((prediction102-testing$price)^2)/(length(testing$price)-5))
 RMSE102
 
-RMSE103=sqrt(sum((prediction103-testing$price)^2)/(length(testing$price)))
+RMSE103=sqrt(sum((prediction103-testing$price)^2)/(length(testing$price)-5))
 RMSE103
 
-RMSE104=sqrt(sum((prediction104-testing$price)^2)/(length(testing$price)))
+RMSE104=sqrt(sum((prediction104-testing$price)^2)/(length(testing$price)-5))
 RMSE104 
 
-RMSE105=sqrt(sum((prediction105-testing$price)^2)/(length(testing$price)))
+RMSE105=sqrt(sum((prediction105-testing$price)^2)/(length(testing$price)-5))
 RMSE105
 
-RMSE106=sqrt(sum((prediction106-testing$price)^2)/(length(testing$price)))
+RMSE106=sqrt(sum((prediction106-testing$price)^2)/(length(testing$price)-5))
 RMSE106  #lowest (E_out - E_in), also lowest E_out (615.03 - 610.4)
+
+generalization_error <- 615.59-610.4
+generalization_error
+
+#Logostic Regression predicting Property Type
+LM101 <- glm(property_type~host_response_rate+neighbourhood+zipcode+room_type+accommodates+bathrooms+bedrooms+beds+price+number_of_reviews+review_scores_rating , df1, family = "binomial")
+summary(LM101)
+
+LM102 <- glm(property_type~room_type+bathrooms+host_response_rate, df1, family = "binomial")
+summary(LM102) #lowest AIC = 103.33
+
+df1$hotelroom[df1$room_type=='Hotel room'] <- 1
+df1$hotelroom[df1$room_type!='Hotel room'] <- 0
+View(df1$hotelroom)
+
+testing$hotelroom[testing$room_type=='Hotel room'] <- 1
+testing$hotelroom[testing$room_type!='Hotel room'] <- 0
+View(testing$hotelroom)
+
+LM103 <- glm(property_type~hotelroom+bathrooms+host_response_rate, df1, family = "binomial")
+summary(LM103) #good AIC = 104.7
+
+View(predict(LM103, testing, type="response")) #building the predicion on LM103
+
+install.packages("caret")
+library(caret)
+install.packages("e1071")
+confusionMatrix(table(predict(LM103, df1, type="response") >= 0.5, df1$property_type == 1)) #the code is not working for some reason
+
+df1$catbathrooms <- factor(df1$bathrooms) 
+class(df1$catbathrooms)
+
+testing$catbathrooms <- factor(testing$bathrooms) 
+class(testing$catbathrooms)
+
+LM104 <- glm(property_type~hotelroom+catbathrooms+host_response_rate, df1, family = "binomial")
+summary(LM104) #changing the bathrooms var to categorical, the results show that the var is insignificant
+
+class(df1$host_response_rate)
+df1$cathost_response_rate <- factor(df1$host_response_rate)
+class(df1$cathost_response_rate)
+
+LM105 <- glm(property_type~hotelroom+bathrooms+cathost_response_rate, df1, family = "binomial")
+summary(LM105) #changing the host_reponse_rate to ccategorocal, the results show that the var is insignificant
