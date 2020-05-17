@@ -13,7 +13,7 @@ training$Sharedroom[training$room_type=='Shared room']<-1
 training$Sharedroom[training$room_type!='Shared room']<-0
 View(testing$Sharedroom)
 
-M11 <- lm(price~Privateroom+Sharedroom+accommodates+bathrooms+number_of_reviews, training)
+M11 <- lm(price~0+Privateroom+Sharedroom+accommodates+bathrooms+number_of_reviews, training)
 summary(M11) #This is the main model we're using to compare all of our individual models to
 M11
 
@@ -34,4 +34,3 @@ RMSE_IN<-sqrt(sum(M11$residuals^2)/length(M11$residuals))  #compute in-sample er
 RMSE_OUT<-sqrt(sum((predict(M11, testing)-testing$price)^2)/length(testing)) #estimate out-of-sample error by comparing the predicted values on the test set to the actual values in the test set
 RMSE_IN  #report E_IN
 RMSE_OUT #report E_OUT
-
