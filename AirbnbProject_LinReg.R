@@ -59,3 +59,30 @@ View(predictions)
 RMSE=sqrt(sum((predictions-testing$price)^2)/(length(testing$price)-4))
 RMSE
 # E_IN = 612.5 E_OUT = 619.5536 Difference: 7.0536
+hist(M2)
+hist(price)
+hist(training)
+hist(training$price)
+hist(testing$price)
+
+#FINAL Model for Regression Task 
+M3 <- lm(price~accommodates+bedrooms+number_of_reviews+review_scores_rating, training)
+summary(M3)
+M3predict <- predict(M3,testing)
+View(predictions)
+M3_RMSE=sqrt(sum((M3predict-testing$price)^2)/(length(testing$price)-5))
+M3_RMSE
+summary(M3$residuals)
+hist(M3$residuals,breaks = 30, prob = TRUE)
+curve(dnorm(x,mean = 0, sd = sd(M3$residuals)), col = "darkblue", lwd = 2, add = TRUE)
+RMSE_IN <- sqrt(sum(M3$residuals^2)/length(M3$residuals))
+RMSE_OUT <- sqrt(sum((predict(M3, testing)-testing$price)^2)/length(testing))
+RMSE_IN
+RMSE_OUT
+confint(M3)
+# Model for Classification Task
+df$price<-factor(df$price)
+M3.1<- glm(price ~ ., data = df_7, family = "binomial")
+summary(M3.1)
+M_LOG<-glm(price ~ accommodates + bedrooms + number_of_reviews + review_scores_rating, data = training, family = "binomial")
+summary(M_LOG)
