@@ -155,30 +155,47 @@ generalization_error <- 615.59-610.4
 generalization_error
 
 #Logostic Regression predicting Property Type
-LM101 <- glm(property_type~host_response_rate+neighbourhood+zipcode+room_type+accommodates+bathrooms+bedrooms+beds+price+number_of_reviews+review_scores_rating , df1, family = "binomial")
+
+df1$typehouse[df1$property_type=='House'] <- 1
+df1$typehouse[df1$property_type!='House'] <- 0
+summary(df1$typehouse)
+View(df1$typehouse)
+
+testing$typehouse[testing$property_type=='House'] <- 1
+testing$typehouse[testing$property_type!='House'] <- 0
+summary(testing$typehouse)
+View(testing$typehouse)
+
+LM101 <- glm(typehouse~host_response_rate+neighbourhood+zipcode+room_type+accommodates+bathrooms+bedrooms+beds+price+number_of_reviews+review_scores_rating , df1, family = "binomial")
 summary(LM101)
 
-LM102 <- glm(property_type~room_type+bathrooms+host_response_rate, df1, family = "binomial")
-summary(LM102) #lowest AIC = 103.33
+LM102 <- glm(typehouse~room_type+bathrooms+host_response_rate, df1, family = "binomial")
+summary(LM102) 
 
-df1$hotelroom[df1$room_type=='Hotel room'] <- 1
-df1$hotelroom[df1$room_type!='Hotel room'] <- 0
-View(df1$hotelroom)
+df1$privateroom[df1$room_type=='Private room'] <- 1
+df1$privateroom[df1$room_type!='Private room'] <- 0
+View(df1$privateroom)
 
-testing$hotelroom[testing$room_type=='Hotel room'] <- 1
-testing$hotelroom[testing$room_type!='Hotel room'] <- 0
-View(testing$hotelroom)
+testing$privateroom[testing$room_type=='Private room'] <- 1
+testing$privateroom[testing$room_type!='Private room'] <- 0
+View(testing$privateroom)
 
-LM103 <- glm(property_type~hotelroom+bathrooms+host_response_rate, df1, family = "binomial")
-summary(LM103) #good AIC = 104.7
+
+#the best model I came up with
+LM103 <- glm(typehouse~privateroom+bathrooms+host_response_rate+bedrooms, df1, family = "binomial")
+summary(LM103) 
 
 View(predict(LM103, testing, type="response")) #building the predicion on LM103
 
 install.packages("caret")
 library(caret)
 install.packages("e1071")
-confusionMatrix(table(predict(LM103, df1, type="response") >= 0.5, df1$property_type == 1)) #the code is not working for some reason
 
+confusionMatrix(table(predict(LM103, df1, type="response") >= 0.5, df1$typehouse == 1)) 
+
+confusionMatrix(table(predict(LM103, testing, type = "response") >= 0.5, testing$typehouse == 1))
+
+##the below code is irrelevant to the project
 df1$catbathrooms <- factor(df1$bathrooms) 
 class(df1$catbathrooms)
 
