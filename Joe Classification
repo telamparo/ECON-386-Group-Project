@@ -1,0 +1,43 @@
+testing <- read.csv('https://raw.githubusercontent.com/telamparo/ECON-386-Group-Project/master/Testing%20Data.csv', header = TRUE)
+training <- read.csv('https://raw.githubusercontent.com/telamparo/ECON-386-Group-Project/master/Training%20Data.csv', header = TRUE)
+training$house[training$property_type=='House'] <- 1
+training$house[training$property_type!='House'] <- 0
+testing$house[testing$property_type=='House'] <- 1
+testing$house[testing$property_type!='House'] <- 0
+####
+install.packages("AppliedPredictiveModeling")
+install.packages("caret")
+install.packages("kernlab")
+install.packages("rattle")
+install.packages("rpart.plot")
+install.packages("randomForest")
+install.packages("e1071")
+install.packages("rpart")
+library(AppliedPredictiveModeling)
+library(caret)
+library(kernlab)
+library(rattle)
+library(rpart.plot)
+library(randomForest)
+library(e1071)
+library(rpart)
+M1 <- glm(house~bedrooms+review_scores_rating+accommodates+price, data = training, family = "binomial")
+confusionMatrix(table(predict(M1, training, type="response") >= 0.5,training$house == 1))
+confusionMatrix(table(predict(M1, testing, type="response") >= 0.5,testing$house == 1))
+M2 <- glm(house~review_scores_rating+accommodates+price, data = training, family = "binomial")
+confusionMatrix(table(predict(M2, training, type="response") >= 0.5,training$house == 1))
+confusionMatrix(table(predict(M2, testing, type="response") >= 0.5,testing$house == 1))
+## need bedrooms, 3% diff##
+
+M3 <- glm(house~review_scores_rating+bedrooms+price, data = training, family = "binomial")
+confusionMatrix(table(predict(M3, training, type="response") >= 0.5,training$house == 1))
+confusionMatrix(table(predict(M3, testing, type="response") >= 0.5,testing$house == 1))
+## so taking accommodates out is better than having it included with bedrooms... intuitively make sense
+M4 <- glm(house~bedrooms+price, data = training, family = "binomial")
+confusionMatrix(table(predict(M4, training, type="response") >= 0.5,training$house == 1))
+confusionMatrix(table(predict(M4, testing, type="response") >= 0.5,testing$house == 1))
+## slightly worse, put back review scores rating
+M5 <- glm(house~review_scores_rating+number_of_reviews+bedrooms+price, data = training, family = "binomial")
+confusionMatrix(table(predict(M3, training, type="response") >= 0.5,training$house == 1))
+confusionMatrix(table(predict(M3, testing, type="response") >= 0.5,testing$house == 1))
+#m5 is slightly better, more sensitive same accuracy
