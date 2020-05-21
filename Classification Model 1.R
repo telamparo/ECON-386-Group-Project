@@ -24,6 +24,9 @@ testing$entirespace[testing$room_type=='Entire home/apt'] <- 1
 testing$entirespace[testing$room_type!='Entire home/apt'] <- 0
 confusionMatrix(table(predict(M2.5, testing, type="response") >= 0.5,testing$house == 1))
 
+confint(M2.5)
+M2.5CI<-cbind(M2.5$coefficients, confint(M2.5))
+exp(M2.5CI)
 
 
 
