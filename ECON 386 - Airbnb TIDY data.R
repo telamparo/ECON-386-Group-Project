@@ -1,5 +1,6 @@
 #ECON 386 GROUP PROJECT: TIDYING THE DATA
 
+
 df_0 <- read.csv('https://raw.githubusercontent.com/telamparo/ECON-386-Group-Project/master/ECON%20386%20-%20Airbnb%20data%20copy%202.csv', header = TRUE) 
 View(df_0)
 sum(is.na(df_0$square_feet)) #13569 of observations have NA value for this variable, so we'll take this out for now
